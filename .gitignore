@@ -1,1 +1,3 @@
 .DS_Store
+node_modules
+out/make/zip/darwin/arm64/System Typing Center-darwin-arm64-1.0.0.zip

@@ -76,12 +76,20 @@ export const getCustomerData = async (id: number) => {
  * Method to get all employees in the system
  * @returns - list of employees
  * */
-export async function fetchAllEmployees(): Promise<empType[] | { error: any }> {
+export async function fetchAllEmployees(
+  page?: number
+): Promise<{ employees: empType[]; totalEmployees: number } | { error: any }> {
   try {
-    const response = await axios.get(`${API_URL}/employees`)
-    const { rows }: { rows: empType[] } = await response.data
+    const response = await axios.get(`${API_URL}/employees/${page ?? 1}`)
+    const {
+      rows: employees,
+      totalEmployees
+    }: {
+      rows: empType[]
+      totalEmployees: number
+    } = await response?.data
 
-    return rows
+    return { employees, totalEmployees }
   } catch (error: any) {
     console.error('Error logging in:', error.message)
     return { error }
@@ -157,9 +165,11 @@ export const getClientName = async (customerId: number) => {
  * Method to get all of the clients in the system
  * @returns - list of clients
  * */
-export const fetchCustomers = async (page?: number) => {
+export const fetchCustomers = async (currentEmpId: number, page?: number) => {
   try {
-    const response = await axios.get(`${API_URL}/customers/${page ?? 1}`)
+    const response = await axios.get(`${API_URL}/customers/${page ?? 1}`, {
+      params: { currentEmpId }
+    })
     const {
       rows: customers,
       totalCountRows: totalCustomers
