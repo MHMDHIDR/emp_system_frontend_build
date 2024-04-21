@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
-import { API_URL } from '../utils/constants'
+import { API_URL, ITEMS_PER_PAGE } from '../utils/constants'
 import { arabicDate, fetchAllEmployees, getArabicRole } from '../utils/helpers'
 import { empType } from '../types'
 import HomeButton from '../components/HomeButton'
+import { Pagination } from '../components/Pagination'
 
 export default function AddEmployee() {
   const [username, setUsername] = useState('')
@@ -22,8 +23,9 @@ export default function AddEmployee() {
   const [comissionPercentage, setComissionPercentage] = useState('')
   const [userAdded, setUserAdded] = useState(false)
   const [alertMessage, setAlertMessage] = useState({ message: '', type: '' })
-
   const [allEmployees, setAllEmployees] = useState<empType[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   const navigate = useNavigate()
 
@@ -71,23 +73,31 @@ export default function AddEmployee() {
 
   useEffect(() => {
     const getRepresentatives = async () => {
-      const employees = await fetchAllEmployees()
+      const response = await fetchAllEmployees(currentPage)
 
-      const uniqueRepresentative =
-        typeof employees === 'object' && Array.isArray(employees)
-          ? (Array.from(new Set(employees.map(employee => employee.full_name)))
-              .map(fullName => {
-                return employees.find(
-                  employee => employee.full_name === fullName && employee.role !== 'admin'
-                )
-              })
-              .filter(employee => employee !== undefined) as empType[])
-          : []
+      if ('error' in response) {
+        console.error('Error fetching employees:', response.error.message)
+      } else {
+        const { employees, totalEmployees } = response
 
-      setAllEmployees(uniqueRepresentative as empType[])
+        const uniqueRepresentative =
+          typeof employees === 'object' && Array.isArray(employees)
+            ? (Array.from(new Set(employees.map(employee => employee.full_name)))
+                .map(fullName => {
+                  return employees.find(
+                    employee =>
+                      employee.full_name === fullName && employee.role !== 'admin'
+                  )
+                })
+                .filter(employee => employee !== undefined) as empType[])
+            : []
+
+        setAllEmployees(uniqueRepresentative as empType[])
+        setTotalPages(Math.ceil((totalEmployees as number) / ITEMS_PER_PAGE))
+      }
     }
     getRepresentatives()
-  }, [])
+  }, [currentPage])
 
   async function deleteEmployee(empId: number) {
     try {
@@ -95,7 +105,7 @@ export default function AddEmployee() {
       const { emp_deleted, message } = await response.data
       if (emp_deleted) {
         setAlertMessage({ message: message, type: 'success' }) // Set success message
-        fetchAllEmployees()
+        fetchAllEmployees(currentPage) // Fetch clients for the selected page (currentPage)
       } else {
         setAlertMessage({ message: message, type: 'error' }) // Set error message
       }
@@ -106,6 +116,11 @@ export default function AddEmployee() {
         type: 'error'
       })
     }
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page) // Update currentPage state
+    fetchAllEmployees(page)
   }
 
   return (
@@ -298,6 +313,12 @@ export default function AddEmployee() {
 
         <div>
           <h3>بيانات الموظفين المضافة</h3>
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+
           <div className='table-container'>
             <table>
               <thead>
@@ -348,6 +369,12 @@ export default function AddEmployee() {
               </tbody>
             </table>
           </div>
+
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
         </div>
       </form>
 
