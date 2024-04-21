@@ -39,7 +39,7 @@ const Services = () => {
     // Fetch services based on searchEndDate
     const fetchServicesByEndDate = async () => {
       const { servicesForCurrentEmployee } = await fetchServices(currentPage, {
-        customerId: Number(customerId)
+        customerId: Number(customer_Id)
       })
 
       let filteredServices = servicesForCurrentEmployee || []
@@ -212,7 +212,7 @@ const Services = () => {
   useEffect(() => {
     const getAllServices = async () => {
       const { servicesForCurrentEmployee } = await fetchServices(currentPage, {
-        customerId: Number(customerId)
+        customerId: Number(customer_Id)
       })
 
       let filteredServices = servicesForCurrentEmployee || []

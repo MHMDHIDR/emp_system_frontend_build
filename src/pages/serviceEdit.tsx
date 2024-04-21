@@ -55,6 +55,12 @@ const ServiceEdit = () => {
   const [paidAmount, setPaidAmount] = useState('')
   const serviceDataEndDateRef = useRef<HTMLInputElement>(null)
 
+  const currentEmpolyee = {
+    name: JSON.parse(localStorage.getItem('employee_data') as string).full_name ?? null,
+    id: Number(JSON.parse(localStorage.getItem('employee_data') as string).id) ?? null,
+    role: JSON.parse(localStorage.getItem('employee_data') as string).role ?? 'employee'
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -69,8 +75,8 @@ const ServiceEdit = () => {
         setLoadingName(employeeName.isLoading)
         setSubServices(JSON.parse(String(service.sub_services)))
 
-        const getCustomers = async () => {
-          const response = await fetchCustomers()
+        const getCustomers = async (page: number) => {
+          const response = await fetchCustomers(currentEmpolyee.id, page)
           const customersWithEmployeeName = response?.customersWithEmployeeName
 
           setAllClients(
@@ -81,7 +87,7 @@ const ServiceEdit = () => {
             ) || []
           )
         }
-        getCustomers()
+        getCustomers(1)
 
         const getRepresentatives = async () => {
           const representatives = await fetchAllEmployees()
