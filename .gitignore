@@ -3,5 +3,5 @@ node_modules
 out/make/zip/darwin/arm64/System Typing Center-darwin-arm64-1.0.0.zip
 out
 package-lock.json
-.vite/renderer/main_window/assets/index-CsFemtJy.js
+.vite
 .gitignore

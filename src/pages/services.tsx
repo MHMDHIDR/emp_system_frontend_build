@@ -130,8 +130,8 @@ const Services = () => {
     setFormData({ ...formData, [name]: value })
   }
 
-  const getCustomers = async () => {
-    const response = await fetchCustomers()
+  const getCustomers = async (page: number) => {
+    const response = await fetchCustomers(currentEmpolyee.id, page)
     const customersWithEmployeeName = response?.customersWithEmployeeName
 
     setAllClients(
@@ -241,7 +241,8 @@ const Services = () => {
   }, [serviceAdded, serviceDeleted, currentPage])
 
   useEffect(() => {
-    getCustomers()
+    const allCustomers = async () => await getCustomers(currentPage)
+    allCustomers()
     const getRepresentatives = async () => {
       const representatives = await fetchAllEmployees()
 
@@ -263,7 +264,7 @@ const Services = () => {
       setAllEmployees(uniqueRepresentative as empType[])
     }
     getRepresentatives()
-  }, [])
+  }, [currentPage])
 
   useEffect(() => {
     setFormData({ ...formData, client_id: customer_Id || '' })
