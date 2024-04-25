@@ -12,7 +12,7 @@ export default function AddEmp() {
   useEffect(() => {
     const getRepresentatives = async () => {
       const employees = await fetchAllEmployees()
-      setAllEmployees(employees as empType[])
+      setAllEmployees(employees as unknown as empType[])
     }
     getRepresentatives()
   }, [])
