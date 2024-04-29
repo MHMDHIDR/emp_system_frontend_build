@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { API_URL } from '../utils/constants'
 import ErrorPage from './error_page'
 import { empType } from '../types'
+import { onlyNumbers } from '../utils/helpers'
 
 export default function AddEmp() {
   const { empId } = useParams()
@@ -65,14 +66,13 @@ export default function AddEmp() {
 
       const { emp_updated, message } = await response.data
 
-      // البيانات المرجعة من السيرفر
-      console.log('data: ', { emp_updated, message })
-
       if (emp_updated) {
         setUserUpdated(true)
         setAlertMessage({ message: message, type: 'success' }) // Set success message
 
-        navigate('/dashboard')
+        setTimeout(() => {
+          navigate('/add_emp')
+        }, 2000)
       } else {
         setAlertMessage({ message: message, type: 'error' }) // Set error message
       }
@@ -240,11 +240,12 @@ export default function AddEmp() {
         <label htmlFor='salary_amount'>الراتب:</label>
         <br />
         <input
-          type='number'
+          type='text'
           id='salary_amount'
           name='salary_amount'
           placeholder='ادخل الراتب'
           onChange={e => setSalaryAmount(e.target.value)}
+          onKeyDown={onlyNumbers}
           defaultValue={employeeData?.salary_amount || ''}
         />
         <br />
@@ -252,13 +253,14 @@ export default function AddEmp() {
         <label htmlFor='commition_percentage'>نسبة العمولة:</label>
         <br />
         <input
-          type='number'
+          type='text'
           min='0'
           max='100'
           id='commition_percentage'
           name='commition_percentage'
           placeholder='ادخل نسبة العمولة'
           onChange={e => setComissionPercentage(e.target.value)}
+          onKeyDown={onlyNumbers}
           defaultValue={employeeData?.comission_percentage}
         />
         <br />
@@ -270,11 +272,11 @@ export default function AddEmp() {
           style={{ cursor: userUpdated ? 'progress' : 'pointer' }}
           disabled={userUpdated}
         />
-
-        {alertMessage.message && (
-          <div className={`alert ${alertMessage.type}`}>{alertMessage.message}</div>
-        )}
       </form>
+
+      {alertMessage.message && (
+        <div className={`alert ${alertMessage.type}`}>{alertMessage.message}</div>
+      )}
 
       <Link to='/dashboard' className='back-btn'>
         العودة

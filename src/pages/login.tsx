@@ -43,7 +43,6 @@ export default function Login() {
         message: 'عفواً! فشل تسجيل الدخول حاول مرة أخرى!',
         type: 'error'
       })
-      console.log(alertMessage.message)
 
       console.error('Error logging in:', error.message)
     }
